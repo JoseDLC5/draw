@@ -18,12 +18,11 @@ class _DrawState extends State<Draw> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: IconButton(
-          icon: Icon(Icons.clear),
+      floatingActionButton: FloatingActionButton(
+          child: const Icon(Icons.clear),
+          backgroundColor: Colors.pink,
           onPressed: () {
-            setState(() {
-              points.clear();
-            });
+            clearPoints();
           }),
       body: GestureDetector(
         onPanStart: (details) {
@@ -57,40 +56,47 @@ class _DrawState extends State<Draw> {
         },
         child: RepaintBoundary(
           child: Container(
-            decoration:
-                BoxDecoration(border: Border.all(color: Colors.blueAccent)),
+
             // color: Colors.transparent,
             child: CustomPaint(
-              size: Size.square(300),
+              size: Size.infinite,
               painter: DrawingPainter(
-                pointsList: points,
-              ),
+                  pointsList: points, box: context.findRenderObject()),
             ),
           ),
         ),
       ),
     );
   }
+
+  void clearPoints() {
+    setState(() {
+      points.clear();
+    });
+  }
 }
 
 class DrawingPainter extends CustomPainter {
-  DrawingPainter({this.pointsList});
+  DrawingPainter({this.pointsList, this.box});
   List<DrawingPoints> pointsList;
   List<Offset> offsetPoints = List();
+  RenderBox box;
   @override
   void paint(Canvas canvas, Size size) {
     //TODO FIX canvas clipping
-    canvas.clipRect(Rect.fromLTRB(0, 0, 300, 300));
+    canvas.clipRect(this.box.semanticBounds);
+    //canvas.clipRRect(rrect)
+
     for (int i = 0; i < pointsList.length - 1; i++) {
       if (pointsList[i] != null && pointsList[i + 1] != null) {
         canvas.drawLine(pointsList[i].points, pointsList[i + 1].points,
             pointsList[i].paint);
       } else if (pointsList[i] != null && pointsList[i + 1] == null) {
-        offsetPoints.clear();
-        offsetPoints.add(pointsList[i].points);
-        offsetPoints.add(Offset(
-            pointsList[i].points.dx + 0.1, pointsList[i].points.dy + 0.1));
-        canvas.drawPoints(PointMode.points, offsetPoints, pointsList[i].paint);
+        // offsetPoints.clear();
+        // offsetPoints.add(pointsList[i].points);
+        // offsetPoints.add(Offset(
+        //     pointsList[i].points.dx + 0.1, pointsList[i].points.dy + 0.1));
+        //canvas.drawPoints(PointMode.points, offsetPoints, pointsList[i].paint);
       }
     }
   }
