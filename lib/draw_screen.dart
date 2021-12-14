@@ -58,7 +58,7 @@ class _DrawState extends State<Draw> {
           child: Container(
 
             // color: Colors.transparent,
-            child: CustomPaint(
+            child: CustomPaint( 
               size: Size.infinite,
               painter: DrawingPainter(
                   pointsList: points, box: context.findRenderObject()),
